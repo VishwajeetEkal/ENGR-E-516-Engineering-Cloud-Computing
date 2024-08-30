@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  server:
+    build: ./server             # Build the server service using the Dockerfile in the ./server directory
+    volumes:
+      - servervol:/serverdata   # Mount a volume for server data
+    ports:
+      - "8080:8080"             # Map port 8080 on the host to port 8080 in the container
+    networks:
+      - app-network             # Attach the service to the "app-network"
+
+  client:
+    build: ./client             # Build the client service using the Dockerfile in the ./client directory
+    volumes:
+      - clientvol:/clientdata   # Mount a volume for client data
+    depends_on:
+      - server                  # Ensure the server service is started before the client service
+    networks:
+      - app-network             # Attach the service to the "app-network"
+    stdin_open: true            # Keep stdin open for the client service
+    tty: true                   # Allocate a pseudo-TTY for the client service
+
+volumes:
+  servervol:                    # Define a volume for server data
+  clientvol:                    # Define a volume for client data
+
+networks:
+  app-network:                  # Define a bridge network for communication between services
+    driver: bridge
+
